@@ -24,13 +24,13 @@ This project is a multi-service application consisting of a PHP web application,
 3. **Build and start the services:**
 
    ```bash
-   docker-compose up --build -d
+   docker compose up --build -d
    ```
 
 4. **Verify the services are running:**
 
    ```bash
-   docker-compose ps
+   docker compose ps
    ```
 
 ## Accessing the Application
