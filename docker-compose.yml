@@ -1,0 +1,82 @@
+# Define all the services required for the Application.
+services:
+  # PHP web app
+  web:
+    # Build the image from the Docker file in the given directory.
+    build: ./php-app
+    # Build image.
+    image: php-app-image:1.0
+    # Assign port.
+    ports:
+      - "8080:80"
+    # Volume to mount current directory into container's directory
+    # for live code changes without re-building the image.
+    volumes:
+      - ./php-app:/var/www/html
+    # Define service dependencies.
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_started
+    # Set environment variables for PHP application.
+    environment:
+      MYSQL_HOST: db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin123
+      MYSQL_DATABASE: mydatabase
+      REDIS_HOST: cache
+      REDIS_PORT: 6379
+    # Restart service if it stops unexpectedly.
+    restart: always
+    networks:
+      - multi-service-app-network
+  
+  # MySQL DB service.
+  db:
+    # Build the image from the Docker file in the given directory.
+    build: ./mysql
+    # Build image.
+    image: mysql-image:1.0
+    # Set environment variables for MySQL.
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: mydatabase
+    # Volume to persist data.
+    # This ensures data is not lost when the container is removed.
+    volumes:
+      - db_data:/var/lib/mysql
+    # Assign port.
+    ports:
+      - "3306:3306"
+    # Restart service if it stops unexpectedly.
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - multi-service-app-network
+  
+  # Redis cache service.
+  cache:
+    # Build the image from the Docker file in the given directory.
+    build: ./redis
+    # Build image.
+    image: redis-image:1.0
+    # Assign port.
+    ports:
+      - "6370:6379"
+    # Restart service if it stops unexpectedly.
+    restart: always
+    networks:
+      - multi-service-app-network
+
+# Define named volume for data persistence.
+volumes:
+  db_data:
+
+networks:
+  multi-service-app-network:
+    driver: bridge
