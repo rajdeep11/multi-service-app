@@ -12,7 +12,7 @@ This project is a multi-service application consisting of a PHP web application,
 1. **Clone the repository:**
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/rajdeep11/multi-service-app.git
    ```
 
 2. **Navigate to the project directory:**
